@@ -1,0 +1,32 @@
+services:
+  condash-proxy:
+    image: ghcr.io/${GITHUB_REPO}:latest
+    container_name: condash-proxy
+    restart: unless-stopped
+    network_mode: host
+    ports:
+      - "${PORT:-5000}:5000"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: condash_proxy_watchtower
+    environment:
+      DOCKER_API_VERSION: "1.49"               # Ubuntu 25.04 Docker
+      WATCHTOWER_LABEL_ENABLE: "true"          # only update containers with the watchtower label
+      WATCHTOWER_POLL_INTERVAL: 60             # check every 1 minute
+      WATCHTOWER_CLEANUP: "true"               # remove old images after update
+      WATCHTOWER_ROLLING_RESTART: "true"       # restart one at a time
+      REPO_USER: ${GHCR_USER}                  # GitHub username
+      REPO_PASS: ${GHCR_PAT}                   # GitHub PAT with read:packages
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
+    restart: unless-stopped
