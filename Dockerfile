@@ -12,4 +12,6 @@ USER appuser
 
 EXPOSE 5000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", "--timeout", "60", "app:app"]
+# Single worker keeps the in-memory rate limiter accurate.
+# To use multiple workers, add a Redis service and point FLASK_LIMITER_STORAGE_URI at it.
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", "--timeout", "60", "app:app"]

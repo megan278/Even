@@ -3,9 +3,16 @@ services:
     image: ghcr.io/${GITHUB_REPO}:latest
     container_name: condash-proxy
     restart: unless-stopped
+    # Pick ONE of the two networking modes below:
+    #
+    # Option A — host networking (Linux only): the container shares the host's
+    # network stack directly. The 'ports' mapping is ignored when this is set.
     network_mode: host
-    ports:
-      - "${PORT:-5000}:5000"
+    #
+    # Option B — bridge networking (default Docker, works on all platforms):
+    # remove 'network_mode: host' above and uncomment 'ports' below.
+    # ports:
+    #   - "${PORT:-5000}:5000"
     env_file:
       - .env
     healthcheck:

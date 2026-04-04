@@ -7,6 +7,7 @@ Designed to be drop-in compatible with corsproxy.io so users can swap between
 the public hosted service and this self-hosted version with no app changes.
 """
 
+import hmac
 import os
 import logging
 import ipaddress
@@ -89,7 +90,7 @@ def validate_api_key(key: str) -> bool:
 	"""Return True if auth passes. When no API_KEY is set, always passes."""
 	if not API_KEY:
 		return True
-	return key == API_KEY
+	return hmac.compare_digest(key, API_KEY)
 
 
 def is_safe_url(url: str) -> tuple[bool, str]:
